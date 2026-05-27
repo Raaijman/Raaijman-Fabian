@@ -22,12 +22,15 @@ body {
   padding: 0;
 }
 
-/* Schermwrapper: het CV-blad gecentreerd op de warme canvas, met marge
-   rondom zodat het als document "zweeft" (schaduw zit op .cv-sheet). */
+/* Schermwrapper: het CV-blad horizontaal gecentreerd op de warme canvas.
+   GEEN verticale padding — het blad plakt tegen de bovenkant (geen witte/
+   taupe strook boven of onder). De taupe is alleen zichtbaar links/rechts
+   van het 794px-blad op brede schermen; de slagschaduw (op .cv-sheet) tilt
+   het blad daar van de canvas af. */
 .cv-wrap {
   display: flex;
   justify-content: center;
-  padding: 40px 24px;
+  padding: 0;
   min-height: 100vh;
   box-sizing: border-box;
 }
