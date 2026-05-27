@@ -5,7 +5,7 @@
 // transform-scale + de geschaalde sizing-wrapper.
 import { cvTheme } from '~~/shared/cv-theme';
 
-export default defineNuxtPlugin((nuxtApp) => {
+export default defineNuxtPlugin(() => {
   const apply = () => {
     // clientWidth (niet innerWidth): het blad is altijd hoger dan de viewport,
     // dus er is altijd een verticale scrollbar. innerWidth telt die scrollbar-
@@ -21,7 +21,13 @@ export default defineNuxtPlugin((nuxtApp) => {
   apply();
   window.addEventListener('resize', apply, { passive: true });
 
-  nuxtApp.hook('app:unmounted', () => {
-    window.removeEventListener('resize', apply);
-  });
+  // Geen Nuxt-hook voor "app unmounted" — in productie leeft de listener voor de
+  // hele page-lifecycle (onschadelijk, navigatie herlaadt de pagina). Cleanup is
+  // alleen relevant bij HMR: elke hot-reload her-runt de plugin en zou anders een
+  // extra resize-listener stapelen.
+  if (import.meta.hot) {
+    import.meta.hot.dispose(() => {
+      window.removeEventListener('resize', apply);
+    });
+  }
 });
