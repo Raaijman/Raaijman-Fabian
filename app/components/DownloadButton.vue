@@ -5,15 +5,7 @@
 </script>
 
 <template>
-  <div
-    class="no-print"
-    :style="{
-      position: 'fixed',
-      top: '20px',
-      right: '20px',
-      zIndex: 50,
-    }"
-  >
+  <div class="no-print fixed top-4 right-4 sm:top-6 sm:right-6 z-40">
     <UButton
       to="/cv.pdf"
       external

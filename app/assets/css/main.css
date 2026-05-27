@@ -6,14 +6,15 @@
 
 :root {
   color-scheme: light;
-  --cv-bg: #fcfbf8;
+  --cv-bg: #fcfbf8; /* kleur van het blad zelf (main-kolom) */
+  --cv-canvas: #e7e1d4; /* warme taupe achtergrond rondom het blad */
   --cv-ink: #1f1c18;
   --cv-accent: #27496d;
 }
 
 html,
 body {
-  background: var(--cv-bg);
+  background: var(--cv-canvas);
   color: var(--cv-ink);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -21,13 +22,36 @@ body {
   padding: 0;
 }
 
-/* Schermwrapper: CV horizontaal gecentreerd, geen verticale marge — de
-   CvPage (794×1123 px = A4 op 96 dpi) plakt tegen de bovenkant zonder witrand.
-   Geen padding/min-height: dat gaf een witte strook boven en onder het blad. */
+/* Schermwrapper: het CV-blad gecentreerd op de warme canvas, met marge
+   rondom zodat het als document "zweeft" (schaduw zit op .cv-sheet). */
 .cv-wrap {
   display: flex;
   justify-content: center;
+  padding: 40px 24px;
+  min-height: 100vh;
   box-sizing: border-box;
+}
+
+/* Het A4-blad (CvPage). Slagschaduw zodat het van de canvas aftilt; de
+   hairline-rand zat eerst inline op de component, nu hier zodat print 'm
+   kan uitschakelen. */
+.cv-sheet {
+  box-shadow:
+    0 8px 28px rgba(31, 28, 24, 0.16),
+    0 2px 6px rgba(31, 28, 24, 0.1),
+    inset 0 0 0 0.5px rgba(0, 0, 0, 0.06);
+}
+
+/* Mobiel/smal: geen canvas-marge of schaduw — het blad vult de breedte,
+   de taupe zijkanten zijn toch niet zichtbaar onder de bladbreedte. */
+@media (max-width: 840px) {
+  .cv-wrap {
+    padding: 0;
+    min-height: 0;
+  }
+  .cv-sheet {
+    box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.06);
+  }
 }
 
 /* A4 print — geen browser-marges; de CvPage-component levert zelf padding. */
@@ -42,6 +66,13 @@ body {
     background: var(--cv-bg);
     margin: 0;
     padding: 0;
+  }
+  .cv-wrap {
+    padding: 0;
+    min-height: 0;
+  }
+  .cv-sheet {
+    box-shadow: none;
   }
   .no-print {
     display: none !important;

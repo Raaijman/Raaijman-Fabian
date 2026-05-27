@@ -7,6 +7,7 @@ defineProps<{ data: CvData }>();
 
 <template>
   <div
+    class="cv-sheet"
     :style="{
       width: `${cvTheme.pageW}px`,
       height: `${cvTheme.pageH}px`,
@@ -17,7 +18,6 @@ defineProps<{ data: CvData }>();
       overflow: 'hidden',
       position: 'relative',
       color: cvTheme.bodyInk,
-      boxShadow: 'inset 0 0 0 0.5px rgba(0,0,0,0.06)',
     }"
   >
     <CvSidebar :data="data" />
