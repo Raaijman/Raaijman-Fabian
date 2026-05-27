@@ -27,6 +27,9 @@
     "nuxt": "^4.0.0",
     "vue": "^3.5.0"
   },
+  "pnpm": {
+    "onlyBuiltDependencies": ["puppeteer"]
+  },
   "devDependencies": {
     "@fontsource/eb-garamond": "^5.1.0",
     "@fontsource/public-sans": "^5.1.0",

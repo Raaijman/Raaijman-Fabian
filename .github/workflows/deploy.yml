@@ -35,6 +35,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Install Chromium for Puppeteer
+        # pnpm 9+ blokkeert standaard de postinstall-build-scripts van deps
+        # (security), dus puppeteer's Chromium-download draait niet automatisch
+        # op de runner. Expliciet ophalen zodat generate-pdf.mjs een browser vindt.
+        run: pnpm exec puppeteer browsers install chrome
+
       - name: Build Nuxt + PDF
         # `build:ci` = `nuxt build && node scripts/generate-pdf.mjs`.
         # Puppeteer rendert de gebuilde site (poort 3010) naar .output/public/cv.pdf
