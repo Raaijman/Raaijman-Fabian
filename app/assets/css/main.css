@@ -21,15 +21,12 @@ body {
   padding: 0;
 }
 
-/* Schermwrapper: CV gecentreerd met wat lucht eromheen. In print verdwijnt
-   die marge zodat puppeteer exact één A4 rendert (CvPage is 794×1123 px,
-   matched A4 op 96 dpi — als de wrapper er ook nog 24+24 px omheen zet
-   overschrijdt de body-hoogte 1123 en knipt puppeteer naar twee pagina's). */
+/* Schermwrapper: CV horizontaal gecentreerd, geen verticale marge — de
+   CvPage (794×1123 px = A4 op 96 dpi) plakt tegen de bovenkant zonder witrand.
+   Geen padding/min-height: dat gaf een witte strook boven en onder het blad. */
 .cv-wrap {
   display: flex;
   justify-content: center;
-  padding: 24px 12px;
-  min-height: 100vh;
   box-sizing: border-box;
 }
 
@@ -45,10 +42,6 @@ body {
     background: var(--cv-bg);
     margin: 0;
     padding: 0;
-  }
-  .cv-wrap {
-    padding: 0;
-    min-height: 0;
   }
   .no-print {
     display: none !important;
