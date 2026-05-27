@@ -1,0 +1,56 @@
+/* Tailwind v4 + @nuxt/ui imports — consistent met de andere Raaijman-apps,
+   zelfs als deze pagina er minimaal gebruik van maakt. Fonts laden we via
+   @fontsource (zie nuxt.config.ts → css), niet via Google Fonts. */
+@import 'tailwindcss';
+@import '@nuxt/ui';
+
+:root {
+  color-scheme: light;
+  --cv-bg: #fcfbf8;
+  --cv-ink: #1f1c18;
+  --cv-accent: #27496d;
+}
+
+html,
+body {
+  background: var(--cv-bg);
+  color: var(--cv-ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  margin: 0;
+  padding: 0;
+}
+
+/* Schermwrapper: CV gecentreerd met wat lucht eromheen. In print verdwijnt
+   die marge zodat puppeteer exact één A4 rendert (CvPage is 794×1123 px,
+   matched A4 op 96 dpi — als de wrapper er ook nog 24+24 px omheen zet
+   overschrijdt de body-hoogte 1123 en knipt puppeteer naar twee pagina's). */
+.cv-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 24px 12px;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* A4 print — geen browser-marges; de CvPage-component levert zelf padding. */
+@page {
+  size: A4;
+  margin: 0;
+}
+
+@media print {
+  html,
+  body {
+    background: var(--cv-bg);
+    margin: 0;
+    padding: 0;
+  }
+  .cv-wrap {
+    padding: 0;
+    min-height: 0;
+  }
+  .no-print {
+    display: none !important;
+  }
+}

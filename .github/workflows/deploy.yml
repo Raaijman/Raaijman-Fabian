@@ -1,0 +1,73 @@
+name: Deploy fabian (SSH)
+
+on:
+  push:
+    branches: [release/fabian]
+  workflow_dispatch: {}
+
+concurrency:
+  group: deploy-fabian
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      SSH_HOST: h61.mijn.host
+      SSH_USER: qv134692
+      # Port 22 = ProFTPD mod_sftp (SFTP-only); port 26 = DA's OpenSSH-shell
+      # die we nodig hebben voor rsync + remote bash.
+      SSH_PORT: 26
+      APP_ROOT: /home/qv134692/fabian.raaijman.nl
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v5
+        with:
+          version: 9.15.0
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24.15.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Nuxt + PDF
+        # `build:ci` = `nuxt build && node scripts/generate-pdf.mjs`.
+        # Puppeteer rendert de gebuilde site (poort 3010) naar .output/public/cv.pdf
+        # zodat /cv.pdf op productie een statische A4 serveert.
+        run: pnpm build:ci
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "${{ secrets.SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Pre-clean .output on server
+        # Defensief tegen stale-files die rsync mist als Passenger een file
+        # vasthoudt tijdens de overdracht.
+        run: |
+          ssh -p "$SSH_PORT" -i ~/.ssh/id_ed25519 "$SSH_USER@$SSH_HOST" \
+            "rm -rf '$APP_ROOT/.output'"
+
+      - name: Rsync .output/ to mijn.host
+        # .output/ is self-contained (Nitro bundelt prod-deps in
+        # .output/server/node_modules/). Geen pnpm install op de server nodig.
+        # Geen migrations-stap want geen DB.
+        run: |
+          SSH_CMD="ssh -p $SSH_PORT -i ~/.ssh/id_ed25519"
+          rsync -avz --delete --mkpath -e "$SSH_CMD" \
+            .output/ "$SSH_USER@$SSH_HOST:$APP_ROOT/.output/"
+
+      - name: Trigger Passenger restart
+        # Phusion Passenger watcht mtime van tmp/restart.txt; touch = worker-spawn.
+        run: |
+          ssh -p "$SSH_PORT" -i ~/.ssh/id_ed25519 "$SSH_USER@$SSH_HOST" \
+            "mkdir -p '$APP_ROOT/tmp' && touch '$APP_ROOT/tmp/restart.txt'"
