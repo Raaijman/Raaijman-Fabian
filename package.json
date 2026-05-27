@@ -16,7 +16,7 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "generate:pdf": "node scripts/generate-pdf.mjs",
-    "build:ci": "nuxt build && node scripts/generate-pdf.mjs",
+    "build:ci": "nuxt build && node scripts/generate-pdf.mjs && nuxt build",
     "test:visual": "node scripts/compare-with-reference.mjs",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

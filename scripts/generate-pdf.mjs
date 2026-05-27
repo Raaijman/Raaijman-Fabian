@@ -1,8 +1,14 @@
 // Build-time PDF-generatie. Start de gebuilde Nuxt-server op poort 3010,
 // laat puppeteer de root-page renderen met print-CSS, schrijft het resultaat
-// naar .output/public/cv.pdf zodat /cv.pdf wordt geserveerd.
+// naar de SOURCE public/cv.pdf.
 //
-// Wordt aangeroepen door `pnpm build:ci` (= `nuxt build && node scripts/generate-pdf.mjs`).
+// Belangrijk: schrijven naar `public/cv.pdf` (project-root), NIET naar
+// `.output/public/`. Nitro serveert statische assets via een public-manifest
+// dat tijdens `nuxt build` wordt vastgelegd; een file die je ná de build in
+// `.output/public/` legt zit niet in dat manifest en geeft 404. Daarom is de
+// flow: build → genereer PDF naar public/ → build opnieuw (zie `build:ci` in
+// package.json), zodat de tweede build cv.pdf mee in het manifest neemt.
+//
 // Vereist dat .output/server/index.mjs bestaat — dus draai eerst `nuxt build`.
 
 import { spawn } from 'node:child_process';
@@ -14,7 +20,7 @@ import puppeteer from 'puppeteer';
 const PORT = 3010;
 const ROOT = `http://localhost:${PORT}/`;
 const SERVER_ENTRY = resolve('.output/server/index.mjs');
-const OUT_PATH = resolve('.output/public/cv.pdf');
+const OUT_PATH = resolve('public/cv.pdf');
 
 if (!existsSync(SERVER_ENTRY)) {
   console.error(`[generate-pdf] ontbrekend: ${SERVER_ENTRY} — draai eerst \`pnpm build\`.`);
@@ -63,10 +69,11 @@ try {
     preferCSSPageSize: true,
   });
 
-  const outDir = resolve('.output/public');
+  const outDir = resolve('public');
   if (!existsSync(outDir)) mkdirSync(outDir, { recursive: true });
   writeFileSync(OUT_PATH, pdf);
   console.log(`[generate-pdf] geschreven: ${OUT_PATH} (${pdf.length} bytes)`);
+  console.log('[generate-pdf] LET OP: draai hierna nogmaals `nuxt build` zodat cv.pdf in het public-manifest komt.');
 
   await browser.close();
 } finally {

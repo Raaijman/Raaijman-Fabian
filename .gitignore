@@ -13,3 +13,5 @@ dist
 .vs
 .claude/settings.local.json
 tests/output
+# Build-artifact: gegenereerd door scripts/generate-pdf.mjs tijdens build:ci.
+public/cv.pdf
