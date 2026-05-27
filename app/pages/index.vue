@@ -15,6 +15,8 @@ useHead({
 <template>
   <div class="cv-wrap">
     <DownloadButton />
-    <CvPage :data="cvData" />
+    <div class="cv-viewport">
+      <CvPage :data="cvData" />
+    </div>
   </div>
 </template>

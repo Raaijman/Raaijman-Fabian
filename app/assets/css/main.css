@@ -10,6 +10,10 @@
   --cv-canvas: #e7e1d4; /* warme taupe achtergrond rondom het blad */
   --cv-ink: #1f1c18;
   --cv-accent: #27496d;
+  /* Schaalfactor van het A4-blad. 1 op desktop/SSR; het client-plugin
+     sheet-scale.client.ts zet 'm op min(1, innerWidth/794) zodra de viewport
+     smaller is dan het blad. */
+  --sheet-scale: 1;
 }
 
 html,
@@ -35,25 +39,36 @@ body {
   box-sizing: border-box;
 }
 
+/* Sizing-box rondom het blad: reserveert de GESCHAALDE afmetingen zodat er
+   geen lege ruimte onder het blad valt en de centrering (via .cv-wrap) klopt.
+   Het blad zelf rendert altijd op zijn echte 794×1123 px en wordt enkel
+   visueel verkleind met transform-scale hieronder. */
+.cv-viewport {
+  width: calc(794px * var(--sheet-scale));
+  height: calc(1123px * var(--sheet-scale));
+}
+
 /* Het A4-blad (CvPage). Slagschaduw zodat het van de canvas aftilt; de
    hairline-rand zat eerst inline op de component, nu hier zodat print 'm
-   kan uitschakelen. */
+   kan uitschakelen. flex-shrink:0 belet dat het blad meekrimpt onder 794px
+   (dat perste de main-kolom tot één-letter-per-regel); in plaats daarvan
+   schaalt transform het hele blad verhoudingsgewijs. */
 .cv-sheet {
+  flex-shrink: 0;
+  transform: scale(var(--sheet-scale));
+  transform-origin: top left;
   box-shadow:
     0 8px 28px rgba(31, 28, 24, 0.16),
     0 2px 6px rgba(31, 28, 24, 0.1),
     inset 0 0 0 0.5px rgba(0, 0, 0, 0.06);
 }
 
-/* Mobiel/smal: geen canvas-marge of schaduw — het blad vult de breedte,
-   de taupe zijkanten zijn toch niet zichtbaar onder de bladbreedte. */
+/* Mobiel/smal: geen verticale wrapper-marge meer nodig. De schaduw blijft —
+   die schaalt gewoon mee met het blad. */
 @media (max-width: 840px) {
   .cv-wrap {
     padding: 0;
     min-height: 0;
-  }
-  .cv-sheet {
-    box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.06);
   }
 }
 
@@ -74,7 +89,15 @@ body {
     padding: 0;
     min-height: 0;
   }
+  /* Print/PDF altijd op volle A4: schaal-transform en geschaalde sizing-box
+     uitschakelen zodat Puppeteer (preferCSSPageSize/format A4) pixel-correct
+     rendert, ongeacht de schermbreedte op het moment van genereren. */
+  .cv-viewport {
+    width: auto;
+    height: auto;
+  }
   .cv-sheet {
+    transform: none;
     box-shadow: none;
   }
   .no-print {
