@@ -5,7 +5,7 @@
 </script>
 
 <template>
-  <div class="no-print fixed top-4 right-4 sm:top-6 sm:right-6 z-40">
+  <div class="no-print fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40">
     <UButton
       to="/cv.pdf"
       external

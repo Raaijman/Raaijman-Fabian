@@ -26,15 +26,17 @@ body {
   padding: 0;
 }
 
-/* Schermwrapper: het CV-blad horizontaal gecentreerd op de warme canvas.
-   GEEN verticale padding — het blad plakt tegen de bovenkant (geen witte/
-   taupe strook boven of onder). De taupe is alleen zichtbaar links/rechts
-   van het 794px-blad op brede schermen; de slagschaduw (op .cv-sheet) tilt
-   het blad daar van de canvas af. */
+/* Schermwrapper: het CV-blad horizontaal gecentreerd op de warme canvas, met
+   verticale shade-marge zodat het als document "zweeft". Slanke bovenmarge
+   (40px), ruime ondermarge (80px): de download-knop staat fixed rechtsonder en
+   moet bij volledig doorscrollen volledig in de onder-taupe vallen, zodat geen
+   CV-regel achter de knop verdwijnt. De taupe is ook links/rechts zichtbaar van
+   het 794px-blad op brede schermen; de slagschaduw (op .cv-sheet) tilt het blad
+   van de canvas af. */
 .cv-wrap {
   display: flex;
   justify-content: center;
-  padding: 0;
+  padding: 40px 24px 80px;
   min-height: 100vh;
   box-sizing: border-box;
 }
@@ -63,12 +65,14 @@ body {
     inset 0 0 0 0.5px rgba(0, 0, 0, 0.06);
 }
 
-/* Mobiel/smal: geen verticale wrapper-marge meer nodig. De schaduw blijft —
-   die schaalt gewoon mee met het blad. */
+/* Mobiel/smal: het blad vult de volle breedte (sheet-scale.client.ts schaalt
+   't naar clientWidth), dus GEEN zij-padding — anders duwt die het geschaalde
+   blad voorbij de viewport en krijg je een horizontale scrollbar. De verticale
+   shade-marge blijft wél (40px boven, 80px onder) zodat de fixed download-knop
+   onderaan de scroll in de taupe valt; min-height erft 100vh uit de basisregel. */
 @media (max-width: 840px) {
   .cv-wrap {
-    padding: 0;
-    min-height: 0;
+    padding: 40px 0 80px;
   }
 }
 
